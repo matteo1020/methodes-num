@@ -148,6 +148,7 @@ def compute(filepath:str, fileout:str = 'out'):
 
     np.savetxt(fileout+'_domain.txt', domain, fmt='%i')
     np.savetxt(fileout+'_pot.txt', pot, fmt='%15.10f')
+    np.save(fileout+'_domain.npy',domain)
     np.save(fileout+'_pot.npy', pot)
 
 if __name__ == "__main__":
