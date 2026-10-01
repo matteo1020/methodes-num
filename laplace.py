@@ -29,14 +29,14 @@ def laplace_pot(domain, outside_value = 0, inside_value = 1, pot_in = 1., pot_ou
 
     # Restriction de la matrice à la zone utile
     domain=domain[i1:i2+1,j1:j2+1]
-
+    
     # Recherche des coordonnées hors et dans le domaine
     outside= np.where(domain==outside_value)
     inside = np.where(domain==inside_value)
 
     # Nombre de points de calcul
     nb = len(inside[0])
-
+    
     # Matrice de numérotation
     numb_vec  = np.arange(0, nb, dtype=np.int32)
     #   Utilisation d'un stockage CSR par facilité --> mais "lent" pour la recherche des voisins (environ 60x plus lent pour l'image d'exemple)
@@ -152,4 +152,4 @@ def compute(filepath:str, fileout:str = 'out'):
 
 if __name__ == "__main__":
 
-    compute('laby.png', 'out')
+    compute('labysimp.png', 'out')
