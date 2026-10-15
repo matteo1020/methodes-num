@@ -33,7 +33,7 @@ def calculer_vitesses(pot, domain, dx=1., dy=1.):
 
     #on fait la différence entre tout sauf la première valeur - tout sauf la dernière valeur : pot_i+1-pot_i
     #on met tout dans u sauf à la première et dernière valeur
-    u[:, 1:-1] = -(pot[:, 1:] - pot[:, :-1]) / dx
+    u[:, 1:-1] = (pot[:, 1:] - pot[:, :-1]) / dx
     v[1:-1, :] = -(pot[1:, :] - pot[:-1, :]) / dy
 
     #on crée un masque booléen qui dit si les deux cellules de part et d'autre d'une face sont dans le fluide (True si pas de paroi)
@@ -48,7 +48,7 @@ def calculer_vitesses(pot, domain, dx=1., dy=1.):
     #nous avions calculé la vitesse sur les faces, maintenant calculons celle-ci au centre des cellules :
     u_c = 0.5 * (u[:, 1:] + u[:, :-1])   # forme (ny, nx)
     v_c = 0.5 * (v[1:, :] + v[:-1, :])   # forme (ny, nx)
-
+    
     return u, v, u_c, v_c
 
 def verifier_divergence(u, v, domain, dx=1., dy=1.):

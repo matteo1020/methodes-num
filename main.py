@@ -21,6 +21,9 @@ pot, domain = m1.charger_donnees()
 #calcul des vitesses
 u, v, u_c, v_c = m1.calculer_vitesses(pot, domain)
 
+#affichage du graohe des vitesses
+m1.graph_vitesse(u_c, v_c)
+
 #verifier divergence
 m1.verifier_divergence(u, v, domain)
 
@@ -38,14 +41,30 @@ c[inlet] = c_inlet_value
 dx =1
 dy = 1
 
-#attention a changggggggggggeeeer !!!!!
-dt = 0.5
+
+max_u = np.max(np.abs(u))
+max_v = np.max(np.abs(v))
+
+#coéfficient de sécurité qui nous éloigne de l'instabilité
+CFL = 0.5
+dt = CFL / (max_u/dx + max_v/dy)
+print(f"max_u = {max_u}, max_v = {max_v}, dt = {dt}")
+
 
 #choix  de la reconstruction spacial ( soit "rc constante" ou "rc linéaire")
 schema = "rc constante"
 
-#choix du nombre de pas temporels
-nb_pas =1000
+sortie = np.zeros_like(domain, dtype=bool)
+sortie[ny-2, :] = (domain[ny-2, :] == 2)
+amont_sortie = np.zeros_like(domain, dtype=bool)
+amont_sortie[ny-3, :] = sortie[ny-2, :]
 
+#choix du nombre de pas temporels
+nb_pas =200
+
+seuil = 0.99
 for n in range(nb_pas):
-    c = m2.euler(u, v,c, dx, dy, dt, inlet, c_inlet_value, schema)
+    c = m2.euler(c, u, v, dx, dy, dt, inlet, c_inlet_value, schema)
+    if c[amont_sortie].max() >= seuil:
+        print("Arrêt au pas", n)
+        break
