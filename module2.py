@@ -57,7 +57,7 @@ def calculer_dcdt(c, u, v,schema, dx, dy):
 
     return dcdt
 
-def euler(u, v, c,dx, dy, dt,inlet, c_inlet_value, schema):
+def euler(c, u, v,dx, dy, dt,inlet, c_inlet_value, schema):
     
     dcdt = calculer_dcdt(c, u, v, schema,dx, dy)
     

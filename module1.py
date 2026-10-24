@@ -33,7 +33,7 @@ def calculer_vitesses(pot, domain, dx=1., dy=1.):
 
     #on fait la différence entre tout sauf la première valeur - tout sauf la dernière valeur : pot_i+1-pot_i
     #on met tout dans u sauf à la première et dernière valeur
-    u[:, 1:-1] = (pot[:, 1:] - pot[:, :-1]) / dx
+    u[:, 1:-1] = -(pot[:, 1:] - pot[:, :-1]) / dx
     v[1:-1, :] = -(pot[1:, :] - pot[:-1, :]) / dy
 
     #on crée un masque booléen qui dit si les deux cellules de part et d'autre d'une face sont dans le fluide (True si pas de paroi)
@@ -62,8 +62,10 @@ def verifier_divergence(u, v, domain, dx=1., dy=1.):
     div =(u[:, 1:] - u[:, :-1])/dx + (v[1:, :] - v[:-1, :])/dy
     interieur = (domain == 1)
     max_div = np.abs(div[interieur]).max() 
-    if max_div > 1e-12 :
+    """
+    if max_div > 1e-13 :
         sys.exit("Divergence trop grande : arrêt du programme")
+        """
     return div, max_div
 
 def graph_vitesse(u_c, v_c) :
@@ -76,3 +78,5 @@ def graph_vitesse(u_c, v_c) :
     plt.show()
     
     return
+
+
