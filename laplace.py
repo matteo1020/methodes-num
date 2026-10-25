@@ -61,12 +61,11 @@ def laplace_pot(domain, outside_value = 0, inside_value = 1, pot_in = 1., pot_ou
     # Création par "List comprehension"
     Aij_inlet  = [ [1., numbering[0 ,j], numbering[0  ,j  ]] for j in list(inlet)]
     Aij_outlet = [ [1., numbering[-1,j], numbering[-1 ,j  ]] for j in list(outlet)]
-
-    Aij_top    = [ [1., numbering[i ,j], numbering[i-1,j  ]] for i,j in tqdm(zip(inside[0], inside[1]), 'A_top')    if i!=0 and i!=domain.shape[0]-1 if domain[i-1,j  ] == inside_value]
-    Aij_bottom = [ [1., numbering[i ,j], numbering[i+1,j  ]] for i,j in tqdm(zip(inside[0], inside[1]), 'A_bottom') if i!=0 and i!=domain.shape[0]-1 if domain[i+1,j  ] == inside_value]
-    Aij_left   = [ [1., numbering[i ,j], numbering[i  ,j-1]] for i,j in tqdm(zip(inside[0], inside[1]), 'A_left')   if i!=0 and i!=domain.shape[0]-1 if domain[i  ,j-1] == inside_value]
-    Aij_right  = [ [1., numbering[i ,j], numbering[i  ,j+1]] for i,j in tqdm(zip(inside[0], inside[1]), 'A_right')  if i!=0 and i!=domain.shape[0]-1 if domain[i  ,j+1] == inside_value]
-
+    
+    Aij_top    = [ [1., numbering[i ,j], numbering[i-1,j  ]] for i,j in zip(inside[0], inside[1]) if i!=0 and i!=domain.shape[0]-1 if domain[i-1,j  ] == inside_value]
+    Aij_bottom = [ [1., numbering[i ,j], numbering[i+1,j  ]] for i,j in zip(inside[0], inside[1]) if i!=0 and i!=domain.shape[0]-1 if domain[i+1,j  ] == inside_value]
+    Aij_left   = [ [1., numbering[i ,j], numbering[i  ,j-1]] for i,j in zip(inside[0], inside[1]) if i!=0 and i!=domain.shape[0]-1 if domain[i  ,j-1] == inside_value]
+    Aij_right  = [ [1., numbering[i ,j], numbering[i  ,j+1]] for i,j in zip(inside[0], inside[1]) if i!=0 and i!=domain.shape[0]-1 if domain[i  ,j+1] == inside_value]
     def count_neigh(i,j):
         count = 0
         if domain[i-1,j] == inside_value:
@@ -80,7 +79,7 @@ def laplace_pot(domain, outside_value = 0, inside_value = 1, pot_in = 1., pot_ou
 
         return float(count)
 
-    Aij_center = [ [-count_neigh(i,j), numbering[i,j], numbering[i,j]] for i,j in tqdm(zip(inside[0], inside[1]), 'A_center') if i!=0 and i!=domain.shape[0]-1]
+    Aij_center = [ [-count_neigh(i,j), numbering[i,j], numbering[i,j]] for i,j in zip(inside[0], inside[1]) if i!=0 and i!=domain.shape[0]-1]
 
     A_parts = [Aij_inlet, Aij_outlet, Aij_left, Aij_right, Aij_bottom, Aij_top, Aij_center]
     A  = [cur[0] for cur_part in A_parts for cur in cur_part]
@@ -137,14 +136,6 @@ def compute(filepath:str, fileout:str = 'out'):
                             inside_value=1,
                             pot_in=100.,
                             pot_out=-100.)
-
-    fig, ax = plt.subplots(1,1)
-    fig.set_size_inches(10,10)
-    ax.imshow(pot)
-    fig.savefig(fileout+'.png')
-
-    ax.imshow(domain)
-    fig.savefig('domain.png')
 
     np.savetxt(fileout+'_domain.txt', domain, fmt='%i')
     np.savetxt(fileout+'_pot.txt', pot, fmt='%15.10f')
