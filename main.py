@@ -11,13 +11,23 @@ import module2 as m2
 import module3  as m3
 from tqdm import tqdm
 
+### Paramètres du problème :
+    
+###labyrinthe
+lab = 'laby3.jpg'
 
+#choix  de la reconstruction spacial ( soit "rc constante" ou "rc linéaire")
+schema = "rc linéaire"
+#choix euler ou rk2
+methode_temp = "rk2"
 
+#a regler en fonction de la taille du labyrinthe pour pas stocker trop  mais quand même assez
+pas_video = 50
 
-### vrai main
+""" vrai main"""
 
 #premier truc à faire dans tous les cas ( chargement des données)
-compute('laby.png', 'out')
+compute(lab, 'out')
 pot, domain = m1.charger_donnees()
 
 #calcul des vitesses
@@ -53,8 +63,6 @@ dt = CFL / (max_u/dx + max_v/dy)
 print(f"max_u = {max_u}, max_v = {max_v}, dt = {dt}")
 
 
-#choix  de la reconstruction spacial ( soit "rc constante" ou "rc linéaire")
-schema = "rc constante"
 
 ny, nx = domain.shape
 sortie = np.zeros_like(domain, dtype=bool)
@@ -62,21 +70,31 @@ sortie[ny-2, :] = (domain[ny-2, :] == 2)
 amont_sortie = np.zeros_like(domain, dtype=bool)
 amont_sortie[ny-3, :] = sortie[ny-2, :]
 
-#choix du nombre de pas temporels
-nb_pas =50000
+#borne maximale de pas temporels (pour pas tourner dans le vide si une condition ne marche pas)
+nb_pas =100000
 
 seuil = 0.99
 
+#variables pour stocker les images
 frames = [c.copy()]          # état initial
 temps  = [0.0]
-pas_video = 100
 
-for n in tqdm(range(nb_pas), desc='Advection'):
-    c = m2.euler(c, u, v, dx, dy, dt, inlet, c_inlet_value, schema)
-    if (n + 1) % pas_video == 0:
-        frames.append(c.copy())     # .copy() indispensable, sinon toutes les frames seraient identiques
-        temps.append((n + 1) * dt)
-    if c[amont_sortie].max() >= seuil:
-        print("Arrêt au pas", n)
-        break
+if methode_temp == "euler" :
+    for n in tqdm(range(nb_pas), desc='Advection'):
+        c = m2.euler(c, u, v, dx, dy, dt, inlet, c_inlet_value, schema,domain)
+        if (n + 1) % pas_video == 0:
+            frames.append(c.copy())     # .copy() indispensable, sinon toutes les frames seraient identiques
+            temps.append((n + 1) * dt)
+        if c[amont_sortie].max() >= seuil:
+            print("Arrêt au pas", n)
+            break
+if methode_temp == "rk2" :
+    for n in tqdm(range(nb_pas), desc='Advection'):
+        c = m2.rk2(c, u, v, dx, dy, dt, inlet, c_inlet_value, schema,domain)
+        if (n + 1) % pas_video == 0:
+            frames.append(c.copy())     # .copy() indispensable, sinon toutes les frames seraient identiques
+            temps.append((n + 1) * dt)
+        if c[amont_sortie].max() >= seuil:
+            print("Arrêt au pas", n)
+            break
 m3.creer_video(frames, temps, domain, nom='advection_upwind_euler')

@@ -61,11 +61,14 @@ def verifier_divergence(u, v, domain, dx=1., dy=1.):
     #vérification que la divergence est nulle
     div =(u[:, 1:] - u[:, :-1])/dx + (v[1:, :] - v[:-1, :])/dy
     interieur = (domain == 1)
-    max_div = np.abs(div[interieur]).max() 
-    """
-    if max_div > 1e-13 :
+    max_div = np.abs(div[interieur]).max()
+    moy_div = np.average(div[interieur])
+    print(f"max_div={max_div}")
+    print(f"moy_div = {moy_div}")
+    
+    if moy_div > 1e-13 :
         sys.exit("Divergence trop grande : arrêt du programme")
-        """
+        
     return div, max_div
 
 def graph_vitesse(u_c, v_c) :
